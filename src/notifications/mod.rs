@@ -8,12 +8,14 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 
 use crate::notifications::discord::{is_discord_webhook, DiscordWebHookBody};
+use crate::notifications::telegram::{is_telegram_api, TelegramAPISendMessageBody};
 use crate::notifications::enums::event_status::EventStatus;
 use crate::notifications::enums::notification_event::{EventType, NotificationEvent};
 use crate::utils::environment::fetch_var;
 use reqwest::Url;
 
 mod discord;
+mod telegram;
 pub mod enums;
 
 pub const WEBHOOK_URL: &str = "WEBHOOK_URL";
@@ -73,7 +75,7 @@ impl NotificationEvent {
       let response_status = parsed_response.status();
       let response_message = parsed_response.text().unwrap();
       match response_status.as_u16() {
-        204 | 201 => info!("[{}]: Webhook message sent successfully!", self),
+        200 | 204 | 201 => info!("[{}]: Webhook message sent successfully!", self),
         _ => error!("Request failed! {}, {}", response_status, response_message),
       }
     } else {
@@ -103,7 +105,10 @@ impl NotificationEvent {
     req = if is_discord_webhook(webhook_url) {
       info!("Sending discord notification <3");
       req.json(&DiscordWebHookBody::from(&notification))
-    } else {
+    } else if is_telegram_api(webhook_url) {
+      info!("Sending telegram notification <3");
+      req.json(&TelegramAPISendMessageBody::from(&notification))
+    }else {
       debug!(
         "Webhook Payload: {}",
         serde_json::to_string(&notification).unwrap()
