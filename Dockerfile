@@ -2,7 +2,7 @@
 # -- Odin Builder -- #
 # ------------------ #
 ARG ODIN_IMAGE_VERSION=latest
-FROM mbround18/valheim-odin:${ODIN_IMAGE_VERSION} as runtime
+FROM zot24/valheim-odin:${ODIN_IMAGE_VERSION} as runtime
 
 # --------------- #
 # -- Steam CMD -- #
