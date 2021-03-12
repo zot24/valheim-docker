@@ -1,4 +1,3 @@
-use crate::notifications::EventStatus;
 use crate::notifications::NotificationMessage;
 use log::debug;
 use serde::{Deserialize, Serialize};
